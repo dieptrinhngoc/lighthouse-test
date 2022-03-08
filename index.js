@@ -9,10 +9,15 @@ console.log('Job scheduled', cronExpr);
 console.log('Output directory', outputDir);
 console.log('Site URL', siteUrl);
 
-schedule.scheduleJob(cronExpr, async function () {
+const job = schedule.scheduleJob(cronExpr, async function () {
   console.log('Job running at', currentTime());
   await audit(siteUrl, outputDir);
-}).on('success', () => {
+});
+if (!job) {
+  throw new Error('Invalid cron expression: ' + cronExpr);
+}
+
+job.on('success', () => {
   console.log('Job completed at', currentTime());
 }).on('error', (err) => {
   console.error('Job failed at', currentTime(), err);

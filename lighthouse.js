@@ -3,21 +3,22 @@ const lighthouse = require('lighthouse');
 const chromeLauncher = require('chrome-launcher');
 
 module.exports = async function (siteUrl, outputDir) {
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir);
+  }
   const reportName = siteUrl.replace(/https?:\/\//, '').concat('_').concat(new Date().toDateString());
-  return Promise.all([
-    // desktop
-    runLighthouse(
-      siteUrl,
-      require('lighthouse/lighthouse-core/config/lr-desktop-config.js'),
-      `${outputDir}/${reportName}_desktop.report.html`
-    ),
-    // mobile
-    runLighthouse(
-      siteUrl,
-      require('lighthouse/lighthouse-core/config/lr-mobile-config.js'),
-      `${outputDir}/${reportName}_mobile.report.html`
-    )
-  ])
+  // desktop
+  await runLighthouse(
+    siteUrl,
+    require('lighthouse/lighthouse-core/config/lr-desktop-config.js'),
+    `${outputDir}/${reportName}_desktop.report.html`
+  )
+  // mobile
+  await runLighthouse(
+    siteUrl,
+    require('lighthouse/lighthouse-core/config/lr-mobile-config.js'),
+    `${outputDir}/${reportName}_mobile.report.html`
+  );
 }
 
 // Source: https://github.com/GoogleChrome/lighthouse/blob/master/docs/readme.md#using-programmatically
